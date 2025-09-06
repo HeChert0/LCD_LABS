@@ -2,14 +2,15 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QCoreApplication>
+#include <QQuickStyle>
 #include <QDebug>
 #include <QFile>
 #include <QDir>
 #include <QUrl>
+#include "labs/lab1/PowerManager.h"
 
-// Проверяем, содержит ли директория ожидаемую структуру проекта
+// содержит ли директория ожидаемую структуру проекта
 static bool looksLikeProjectRoot(const QDir &dir) {
-    // ожидаемая структура: qml/Main.qml или resources/images/MM_left.png
     QFileInfo f1(dir.filePath("qml/Main.qml"));
     QFileInfo f2(dir.filePath("resources/images/MM_left.png"));
     return f1.exists() || f2.exists();
@@ -86,7 +87,11 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 
+    QQuickStyle::setStyle("Fusion");
     QQmlApplicationEngine engine;
+
+    //qmlRegisterSingletonInstance<PowerManager>("com.company.PowerManager", 1, 0, "PowerManager", new PowerManager());
+    qmlRegisterType<PowerManager>("com.company.PowerManager", 1, 0, "PowerManager");
 
     // Попробуем обнаружить корень проекта (исходную папку, где лежат qml/ и resources/)
     QString projectRoot = detectProjectRoot();

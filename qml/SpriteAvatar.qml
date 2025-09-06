@@ -1,33 +1,32 @@
-// SpriteAvatar.qml (Новая, стабильная версия)
+// SpriteAvatar.qml
 import QtQuick 6.8
 
 Item {
     id: root
 
-    // --- Свойства для управления извне ---
+    // Свойства для управления извне
     property url moveSource: (typeof projectDir !== "undefined" && projectDir !== "") ? projectDir + "resources/images/MM_move.png" : "qrc:/images/MM_move.png"
     property url idleSource: (typeof projectDir !== "undefined" && projectDir !== "") ? projectDir + "resources/images/MM_stat.png" : "qrc:/images/MM_stat.png"
     property bool playing: false
     property bool flipped: false
 
-    // --- Внутренние данные анимации ---
+    //Внутренние данные анимации
     property var moveFrameWidths: [55,55,55,45,35,45,55,55,55,50,35,50]
     property var idleFrameWidths: [50,50,50,50,50,50,50,50,50,50,50]
     property int frameIndex: 0
 
-    // --- ГЛАВНОЕ ИЗМЕНЕНИЕ: Фиксированный размер компонента ---
     // Мы берем максимальную возможную ширину кадра (55px) и делаем ее постоянной.
     // Это устраняет "дергание" геометрии и конфликты.
     width: 55
     height: 70
 
-    // --- Логика смены состояния ---
+    //Логика смены состояния
     onPlayingChanged: {
         frameIndex = 0; // Сбрасываем кадр при смене анимации (бег/покой)
         canvas.requestPaint();
     }
 
-    // --- Загрузчики спрайт-листов ---
+    // Загрузчики спрайт-листов
     Image { id: moveSheet; source: root.moveSource; visible: false; cache: true }
     Image { id: idleSheet; source: root.idleSource; visible: false; cache: true }
 
@@ -63,9 +62,9 @@ Item {
         }
     }
 
-    // --- Таймеры для анимации ---
+    //Таймеры для анимации
     Timer {
-        interval: 100 // Оптимальная скорость для анимации бега
+        interval: 100
         repeat: true
         running: root.playing
         onTriggered: {
@@ -84,7 +83,6 @@ Item {
         }
     }
 
-    // --- Публичные методы для управления ---
     function startAnimation() {
         root.playing = true;
     }
