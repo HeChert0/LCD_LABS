@@ -52,12 +52,8 @@ Item {
             height: root.height * 0.08
             z: 2
 
-            onPressed: console.log("Button pressed:", index + 1)
-            onReleased: console.log("Button released:", index + 1)
             onClicked: {
-                console.log("Button clicked:", index + 1)
                 if (index === 0) {
-                    console.log("Trying to push Lab1Page...")
                     stackView.push("labs/lab1/Lab1Page.qml")
                 }
             }
@@ -83,10 +79,8 @@ Item {
                 hoverEnabled: true
                 onEntered: {
                     root.hoveredButtonIndex = index
-                    console.log("Mouse entered button:", index)
                 }
                 onClicked: {
-                    console.log("MouseArea clicked on button:", index)
                     btn.clicked()
                 }
             }
@@ -179,13 +173,5 @@ Item {
 
         console.log("MainMenuPage loaded")
         console.log("Root size:", root.width, root.height)
-        console.log("Buttons grid position:", buttonsGrid.x, buttonsGrid.y)
-        console.log("Buttons grid size:", buttonsGrid.width, buttonsGrid.height)
-        console.log("Buttons grid children:", buttonsGrid.children.length)
-
-        for (var i = 0; i < buttonsGrid.children.length; i++) {
-            var btn = buttonsGrid.children[i];
-            console.log("Button", i, "position:", btn.x, btn.y, "size:", btn.width, btn.height)
-        }
     }
 }

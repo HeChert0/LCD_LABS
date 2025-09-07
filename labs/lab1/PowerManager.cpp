@@ -57,8 +57,18 @@ int PowerManager::batteryLevel() const
 
 QString PowerManager::powerSavingMode() const
 {
-    // Флаг 128 означает, что режим экономии энергии включен (в Windows 10/11)
-    return (m_powerStatus->SystemStatusFlag == 128) ? "Включен" : "Выключен";
+    // Согласно документации Microsoft, флаг SystemStatusFlag равен 1,
+    // если режим экономии заряда включен (для Windows 10 и новее).
+    if (m_powerStatus->SystemStatusFlag == 1) {
+        return "Включен";
+    }
+
+    // Режим также считается выключенным, если питание от сети.
+    if (m_powerStatus->ACLineStatus == 1) {
+        return "Выключен (питание от сети)";
+    }
+
+    return "Выключен";
 }
 
 QString PowerManager::batteryFullLifeTime() const

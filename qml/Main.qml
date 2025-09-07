@@ -8,7 +8,7 @@ ApplicationWindow {
     title: "LCD_LABS"
     width: 1024
     height: 576
-    color: "black"
+    color: "transparent"
 
     Component.onCompleted: {
         console.log("Main window loaded")

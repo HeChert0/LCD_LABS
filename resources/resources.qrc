@@ -4,5 +4,7 @@
         <file>images/MM_stat.png</file>
         <file>images/MM_move.png</file>
         <file>labs/lab1/Lab1Page.qml</file>
+        <file>images/MM_fire.png</file>
+        <file>images/MM_pila.png</file>
     </qresource>
 </RCC>

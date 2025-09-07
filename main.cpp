@@ -84,14 +84,13 @@ static QString findMainQml(const QString &projectRoot) {
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 
     QQuickStyle::setStyle("Fusion");
     QQmlApplicationEngine engine;
 
-    //qmlRegisterSingletonInstance<PowerManager>("com.company.PowerManager", 1, 0, "PowerManager", new PowerManager());
-    qmlRegisterType<PowerManager>("com.company.PowerManager", 1, 0, "PowerManager");
+    qmlRegisterSingletonInstance<PowerManager>("com.company.PowerManager", 1, 0, "PowerManager", new PowerManager());
+    //qmlRegisterType<PowerManager>("com.company.PowerManager", 1, 0, "PowerManager");
 
     // Попробуем обнаружить корень проекта (исходную папку, где лежат qml/ и resources/)
     QString projectRoot = detectProjectRoot();
