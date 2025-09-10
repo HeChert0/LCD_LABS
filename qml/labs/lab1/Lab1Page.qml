@@ -67,16 +67,16 @@ Item {
             Button {
                 text: "Сон"
                 onClicked: powerManager.sleep()
-                width: root.width * 0.12
-                height: root.height * 0.08
+                width: root.width * 0.3
+                height: root.height * 0.3
                 background: Rectangle { color: "darkgreen"; radius: 5 }
                 contentItem: Text { text: parent.text; font.pixelSize: parent.height * 0.5; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; color: "black" }
             }
             Button {
                 text: "Гибернация"
                 onClicked: powerManager.hibernate()
-                width: root.width * 0.12
-                height: root.height * 0.08
+                width: root.width * 0.3
+                height: root.height * 0.3
                 background: Rectangle { color: "darkgreen"; radius: 5 }
                 contentItem: Text { text: parent.text; font.pixelSize: parent.height * 0.5; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; color: "black" }
             }
