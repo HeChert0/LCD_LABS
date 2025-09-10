@@ -1,4 +1,3 @@
-// labs/lab1/PowerManager.h
 #ifndef POWERMANAGER_H
 #define POWERMANAGER_H
 
