@@ -1,4 +1,3 @@
-// qml/labs/lab1/Lab1Page.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts

@@ -1,14 +1,13 @@
 #include "PowerManager.h"
 #include <Windows.h>
-#include <powrprof.h>   // Для SetSuspendState и функций схем питания
+#include <powrprof.h>
 #include <SetupAPI.h>
-#include <devguid.h>    // Для GUID_DEVCLASS_BATTERY
-#include <batclass.h>   // Для IOCTL_BATTERY... и структур
+#include <devguid.h>
+#include <batclass.h>
 
 #pragma comment(lib, "Setupapi.lib")
 #pragma comment(lib, "Powrprof.lib")
 
-// Windows.h переопределяет некоторые вещи, поэтому undef'иним их
 #ifdef QT_NO_DEBUG
 #undef QT_NO_DEBUG
 #endif
@@ -51,12 +50,9 @@ int PowerManager::batteryLevel() const
 
 QString PowerManager::powerSavingMode() const
 {
-    // Согласно документации Microsoft, флаг SystemStatusFlag равен 1,
-    // если режим экономии заряда включен (для Windows 10 и новее).
     if (m_powerStatus->SystemStatusFlag == 1) {
         return "Включен";
     }
-    // Режим также считается выключенным, если питание от сети.
     if (m_powerStatus->ACLineStatus == 1) {
         return "Выключен (питание от сети)";
     }
@@ -93,8 +89,7 @@ QString PowerManager::batteryType() const
 
 void PowerManager::sleep()
 {
-    // false - сон, true - гибернация
-    SetSuspendState(false, true, true);
+    SetSuspendState(false, true, false);
 }
 
 void PowerManager::hibernate()
@@ -120,7 +115,8 @@ void PowerManager::queryBatteryType()
             if (pdidd) {
                 pdidd->cbSize = sizeof(*pdidd);
                 if (SetupDiGetDeviceInterfaceDetail(hdev, &did, pdidd, cbRequired, &cbRequired, 0)) {
-                    HANDLE hBattery = CreateFile(pdidd->DevicePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+                    HANDLE hBattery = CreateFile(pdidd->DevicePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                                                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); // сама батарея
                     if (hBattery != INVALID_HANDLE_VALUE) {
                         BATTERY_QUERY_INFORMATION bqi = {0};
                         DWORD dwWait = 0, dwOut;
@@ -145,6 +141,9 @@ void PowerManager::queryBatteryType()
         m_batteryType = "Тип неизвестен";
     }
 }
+
+
+
 
 /*
 HDEVINFO hdev = SetupDiGetClassDevs(
@@ -216,6 +215,14 @@ BatteryManufactureDate - дата производства
 BatteryManufactureName - производитель
 
 BatterySerialNumber - серийный номер
+
+GENERIC_READ | GENERIC_WRITE: Запрашивает права на чтение и запись (необходимы для отправки IOCTL-запросов).
+
+FILE_SHARE_READ | FILE_SHARE_WRITE: Позволяет другим процессам также открывать это устройство.
+
+OPEN_EXISTING: Открывает существующее устройство (не создает новое).
+
+Это низкоуровневый доступ к драйверу батареи.
  */
 
 /*

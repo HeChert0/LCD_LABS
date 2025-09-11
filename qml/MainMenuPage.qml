@@ -1,4 +1,3 @@
-// qml/MainMenuPage.qml
 import QtQuick
 import QtQuick.Controls
 
