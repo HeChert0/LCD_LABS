@@ -15,86 +15,77 @@ Item {
         z: -1
     }
 
-    Column {
-        id: buttonsColumn
-        spacing: root.height * 0.03
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: root.height * 0.04
-        z: 1
-
-        Row {
+    Grid {
+            id: buttonsGrid
+            columns: 3
             spacing: root.width * 0.03
+            rowSpacing: root.height * 0.03
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: root.height * 0.04
+            z: 1
+
             Repeater {
-                model: 3
+                model: 6
                 delegate: menuButton
-                property int rowIndex: 0
             }
         }
 
-        Row {
-            spacing: root.width * 0.03
-            Repeater {
-                model: 3
-                delegate: menuButton
-                property int rowIndex: 1
-            }
-        }
-    }
+        Component {
+            id: menuButton
+            Button {
+                id: btn
 
-    Component {
-        id: menuButton
-        Button {
-            id: btn
-            text: "Lab " + (index + 1)
-            width: root.width * 0.12
-            height: root.height * 0.08
-            z: 2
+                text: "Lab " + (index + 1)
+                width: root.width * 0.12
+                height: root.height * 0.08
+                z: 2
 
-            onClicked: {
-                switch(index)
-                {
-                case 0: stackView.push("labs/lab1/Lab1Page.qml")
-                    break;
-                case 1: stackView.push("labs/lab2/Lab2Page.qml")
-                    break;
-                case 2: stackView.push("labs/lab3/Lab3Page.qml")
-                    break;
-                }
-            }
-
-            background: Rectangle {
-                color: btn.down ? "green" : (btn.hovered ? "lightgreen" : "darkgreen")
-                radius: 5
-                border.width: 2
-                border.color: "white"
-            }
-
-            contentItem: Text {
-                text: btn.text
-                font.pixelSize: btn.height * 0.5
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                color: "black"
-            }
-
-            MouseArea {
-                id: mouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                onEntered: {
-                    root.hoveredButtonIndex = index
-                }
                 onClicked: {
-                    btn.clicked()
+                    switch(index) {
+                        case 0: stackView.push("labs/lab1/Lab1Page.qml"); break;
+                        case 1: stackView.push("labs/lab2/Lab2Page.qml"); break;
+                        case 2: stackView.push("labs/lab3/Lab3Page.qml"); break;
+                        case 3: stackView.push("labs/lab4/Lab4Page.qml"); break;
+                        case 4: stackView.push("labs/lab5/Lab5Page.qml"); break;
+                        case 5: stackView.push("labs/lab6/Lab6Page.qml"); break;
+                    }
+                }
+
+                background: Rectangle {
+                    color: btn.down ? "green" : (btn.hovered ? "lightgreen" : "darkgreen")
+                    radius: 5
+                    border.width: 2
+                    border.color: "white"
+                }
+
+                contentItem: Text {
+                    text: btn.text
+                    font.pixelSize: btn.height * 0.5
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    color: "black"
+                }
+
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: {
+                        root.hoveredButtonIndex = index
+                    }
+                    onClicked: {
+                        btn.clicked()
+                    }
                 }
             }
         }
-    }
+
 
     SpriteAvatar {
         id: avatar
-        z: 0
+        z: 3
     }
 
     ParallelAnimation {
@@ -112,12 +103,7 @@ Item {
             return;
         }
 
-        var targetButton
-        if (hoveredButtonIndex < 3) {
-            targetButton = buttonsColumn.children[0].children[hoveredButtonIndex]
-        } else {
-            targetButton = buttonsColumn.children[1].children[hoveredButtonIndex - 3]
-        }
+        var targetButton = buttonsGrid.children[hoveredButtonIndex];
 
         if (!targetButton) return;
 
