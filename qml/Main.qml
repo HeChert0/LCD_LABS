@@ -10,8 +10,12 @@ ApplicationWindow {
     color: "transparent"
 
     Component.onCompleted: {
-        console.log("Main window loaded")
-    }
+            var component = Qt.createComponent("qrc:/qml/labs/lab2/Lab2Page.qml")
+            if (component.status === Component.Ready) {
+                console.log("Lab2Page preloaded")
+            }
+            console.log("Main window loaded");
+        }
 
     StackView {
         id: stackView

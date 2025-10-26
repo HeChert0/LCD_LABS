@@ -61,13 +61,25 @@ QString PowerManager::powerSavingMode() const
 
 QString PowerManager::batteryFullLifeTime() const
 {
-    if (m_powerStatus->BatteryFullLifeTime == (DWORD)-1) {
-        return "Неизвестно";
+    if (m_powerStatus->BatteryFullLifeTime != (DWORD)-1) {
+        int totalSeconds = m_powerStatus->BatteryFullLifeTime;
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        return QString("%1 ч %2 мин").arg(hours).arg(minutes);
     }
-    int totalSeconds = m_powerStatus->BatteryFullLifeTime;
-    int hours = totalSeconds / 3600;
-    int minutes = (totalSeconds % 3600) / 60;
-    return QString("%1 ч %2 мин").arg(hours).arg(minutes);
+
+    if (m_powerStatus->BatteryLifeTime != (DWORD)-1 && m_powerStatus->BatteryLifePercent != 255) {
+        int remaining = m_powerStatus->BatteryLifeTime;
+        int percent = m_powerStatus->BatteryLifePercent;
+        if (percent > 0) {
+            int totalSeconds = (remaining * 100) / percent;
+            int hours = totalSeconds / 3600;
+            int minutes = (totalSeconds % 3600) / 60;
+            return QString("%1 ч %2 мин").arg(hours).arg(minutes);
+        }
+    }
+
+    return "Неизвестно";
 }
 
 QString PowerManager::batteryLifeTime() const
@@ -99,7 +111,7 @@ void PowerManager::hibernate()
 
 void PowerManager::queryBatteryType()
 {
-    HDEVINFO hdev = SetupDiGetClassDevs(&GUID_DEVCLASS_BATTERY, 0, 0, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE); //список
+    HDEVINFO hdev = SetupDiGetClassDevs(&GUID_DEVCLASS_BATTERY, 0, 0, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
     if (hdev == INVALID_HANDLE_VALUE) {
         m_batteryType = "Доступ к устройствам не удался";
         return;
@@ -107,16 +119,16 @@ void PowerManager::queryBatteryType()
     SP_DEVICE_INTERFACE_DATA did = {0};
     did.cbSize = sizeof(did);
 
-    if (SetupDiEnumDeviceInterfaces(hdev, 0, &GUID_DEVCLASS_BATTERY, 0, &did)) { //пол интерфейсы
+    if (SetupDiEnumDeviceInterfaces(hdev, 0, &GUID_DEVCLASS_BATTERY, 0, &did)) {
         DWORD cbRequired = 0;
-        SetupDiGetDeviceInterfaceDetail(hdev, &did, 0, 0, &cbRequired, 0); //размер буфера
+        SetupDiGetDeviceInterfaceDetail(hdev, &did, 0, 0, &cbRequired, 0);
         if (ERROR_INSUFFICIENT_BUFFER == GetLastError()) {
             PSP_DEVICE_INTERFACE_DETAIL_DATA pdidd = (PSP_DEVICE_INTERFACE_DETAIL_DATA)LocalAlloc(LPTR, cbRequired);
             if (pdidd) {
                 pdidd->cbSize = sizeof(*pdidd);
                 if (SetupDiGetDeviceInterfaceDetail(hdev, &did, pdidd, cbRequired, &cbRequired, 0)) {
                     HANDLE hBattery = CreateFile(pdidd->DevicePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                                                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); // сама батарея
+                                                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
                     if (hBattery != INVALID_HANDLE_VALUE) {
                         BATTERY_QUERY_INFORMATION bqi = {0};
                         DWORD dwWait = 0, dwOut;

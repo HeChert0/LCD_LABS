@@ -8,6 +8,10 @@
 #include <QDir>
 #include <QUrl>
 #include "labs/lab1/PowerManager.h"
+#include "labs/lab2/PciManager.h"
+#include "labs/lab3/HddManager.h"
+#include "labs/lab4/CameraManager.h"
+
 
 static bool looksLikeProjectRoot(const QDir &dir) {
     QFileInfo f1(dir.filePath("qml/Main.qml"));
@@ -76,6 +80,25 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     qmlRegisterSingletonInstance<PowerManager>("com.company.PowerManager", 1, 0, "PowerManager", new PowerManager());
+    qmlRegisterSingletonType<PciManager>("com.company.PciManager", 1, 0, "PciManager",
+                                         [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+                                             Q_UNUSED(engine)
+                                             Q_UNUSED(scriptEngine)
+                                             return new PciManager();
+                                         });
+    qmlRegisterSingletonType<HddManager>("com.company.HddManager", 1, 0, "HddManager",
+                                         [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+                                             Q_UNUSED(engine)
+                                             Q_UNUSED(scriptEngine)
+                                             return new HddManager();
+                                         });
+    qmlRegisterSingletonType<CameraManager>("com.company.CameraManager", 1, 0, "CameraManager",
+                                            [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+                                                Q_UNUSED(engine)
+                                                Q_UNUSED(scriptEngine)
+                                                return new CameraManager();
+                                            });
+
 
     QString projectRoot = detectProjectRoot();
     if (!projectRoot.isEmpty()) {

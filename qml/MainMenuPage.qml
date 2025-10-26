@@ -52,8 +52,14 @@ Item {
             z: 2
 
             onClicked: {
-                if (index === 0) {
-                    stackView.push("labs/lab1/Lab1Page.qml")
+                switch(index)
+                {
+                case 0: stackView.push("labs/lab1/Lab1Page.qml")
+                    break;
+                case 1: stackView.push("labs/lab2/Lab2Page.qml")
+                    break;
+                case 2: stackView.push("labs/lab3/Lab3Page.qml")
+                    break;
                 }
             }
 
