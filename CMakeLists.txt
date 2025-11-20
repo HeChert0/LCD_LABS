@@ -35,8 +35,6 @@ qt_add_executable(LCD_LABS
     labs/lab5/UsbManager.h
     ${LCD_LABS_RESOURCES}
     qml/labs/lab3/PendulumSprite.qml
-
-
 )
 
 target_link_libraries(LCD_LABS PRIVATE
@@ -46,7 +44,8 @@ target_link_libraries(LCD_LABS PRIVATE
     Qt6::Network
     Qt6::Multimedia
     Qt6::CorePrivate
-    Powrprof # для SetSuspendState
-    Setupapi #SetupDi
+    Powrprof
     setupapi
+    cfgmgr32
+    user32
 )

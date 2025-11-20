@@ -5,13 +5,12 @@
 #include <QAbstractNativeEventFilter>
 #include <QVariantList>
 #include <QTimer>
-#include <qwindowdefs.h>
+#include <qwindowdefs.h> // Для WId
 
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <dbt.h>
 #include <setupapi.h>
-#include <winioctl.h>
 #endif
 
 class UsbManager : public QObject, public QAbstractNativeEventFilter
@@ -40,9 +39,6 @@ private slots:
 
 private:
     void addDevice(const QVariantMap &deviceDetails);
-    void ejectFlashDrive(const QString &deviceId);
-    void disableHIDDevice(const QString &instanceId);
-    bool isExternalUSBDevice(HDEVINFO hDevInfo, SP_DEVINFO_DATA* devInfoData);
 
     QVariantList m_devices;
     HDEVNOTIFY m_notifyHandle;
