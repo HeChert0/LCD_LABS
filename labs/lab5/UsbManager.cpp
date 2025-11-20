@@ -64,10 +64,7 @@ void UsbManager::rescanDevices()
 
     // --- Шаг 1: Получаем ВСЕ устройства на шине USB ---
     HDEVINFO hDevInfo = SetupDiGetClassDevs(NULL, L"USB", NULL, DIGCF_PRESENT | DIGCF_ALLCLASSES);
-    if (hDevInfo == INVALID_HANDLE_VALUE) {
-        emit logMessage("Error: Could not get device info list for USB bus.");
-        return;
-    }
+    if (hDevInfo == INVALID_HANDLE_VALUE) { /* ... */ return; }
 
     SP_DEVINFO_DATA devInfoData;
     devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
@@ -77,21 +74,20 @@ void UsbManager::rescanDevices()
             SetupDiGetDeviceRegistryPropertyW(hDevInfo, &devInfoData, SPDRP_DEVICEDESC, NULL, (PBYTE)devName, sizeof(devName), NULL))
         {
             QString displayName = QString::fromWCharArray(devName);
-
-            // Фильтруем только самый низкоуровневый "мусор", остальное оставляем
             if (displayName.contains("Host Controller", Qt::CaseInsensitive) || displayName.contains("Root Hub", Qt::CaseInsensitive)) {
                 continue;
             }
 
             QVariantMap details;
-            details["id"] = displayName; // Временный ID
+            details["id"] = displayName;
             details["displayName"] = displayName;
-            details["isEjectable"] = false; // По умолчанию все неизвлекаемое
+            details["isEjectable"] = false;
+            // Сохраняем DEVINST - он нужен для отключения
+            details["devInst"] = (qulonglong)devInfoData.DevInst;
             addDevice(details);
         }
     }
     SetupDiDestroyDeviceInfoList(hDevInfo);
-
 
     // --- Шаг 2: "Обогащаем" флешки информацией о дисках ---
     const auto drives = QStorageInfo::mountedVolumes();
@@ -105,28 +101,44 @@ void UsbManager::rescanDevices()
         if (driveType == DRIVE_REMOVABLE) {
             QString driveLetter = root.left(2);
             QString driveName = drive.name();
-
-            // Ищем в нашем списке устройство, которое является этой флешкой.
-            // Обычно флешка определяется как "Запоминающее устройство" или "Mass Storage".
             for (int i = 0; i < m_devices.size(); ++i) {
                 QVariantMap deviceMap = m_devices[i].toMap();
                 QString currentName = deviceMap["displayName"].toString();
-
                 if (currentName.contains("Storage", Qt::CaseInsensitive) || currentName.contains("Запоминающее", Qt::CaseInsensitive))
                 {
-                    // Нашли! Обновляем информацию.
                     deviceMap["isEjectable"] = true;
-                    deviceMap["id"] = root; // Правильный ID для извлечения
+                    deviceMap["id"] = root;
                     deviceMap["displayName"] = QString("%1 (%2)").arg(driveName.isEmpty() ? "Removable Drive" : driveName).arg(driveLetter);
-                    m_devices[i] = deviceMap; // Заменяем старую запись на новую
+                    // У флешки нет DEVINST для отключения, ставим 0
+                    deviceMap["devInst"] = (qulonglong)0;
+                    m_devices[i] = deviceMap;
                     break;
                 }
             }
         }
     }
-
     emit devicesChanged();
 }
+
+
+void UsbManager::disableDevice(qulonglong devInst)
+{
+    if (devInst == 0) {
+        emit logMessage("Disable error: This device cannot be disabled programmatically.");
+        return;
+    }
+
+    // Вызываем функцию из CfgMgr32 API для отключения устройства
+    CONFIGRET cr = CM_Disable_DevNode((DEVINST)devInst, 0);
+
+    if (cr == CR_SUCCESS) {
+        emit logMessage("Device disabled successfully.");
+        m_rescanTimer->start(); // Пересканируем, чтобы обновить список
+    } else {
+        emit logMessage(QString("Disable failed with error code: %1. Try running as Administrator.").arg(cr));
+    }
+}
+
 
 void UsbManager::addDevice(const QVariantMap &deviceDetails)
 {

@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <dbt.h>
 #include <setupapi.h>
+#include <cfgmgr32.h>
 #endif
 
 class UsbManager : public QObject, public QAbstractNativeEventFilter
@@ -23,6 +24,7 @@ public:
     ~UsbManager();
 
     Q_INVOKABLE void ejectDevice(const QString &deviceId);
+    Q_INVOKABLE void disableDevice(qulonglong devInst);
     Q_INVOKABLE void initialScan();
 
     QVariantList devices() const;

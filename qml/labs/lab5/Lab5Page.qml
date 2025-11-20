@@ -102,28 +102,38 @@ Page {
 
             // Кнопка извлечения
             Button {
-                text: "Безопасно\nизвлечь"
-                Layout.alignment: Qt.AlignTop
-                Layout.topMargin: 10
-                // Кнопка активна, только если выбран извлекаемый элемент
-                enabled: deviceListView.currentIndex !== -1 && UsbManager.devices[deviceListView.currentIndex].isEjectable
-                onClicked: {
-                    var selectedDevice = UsbManager.devices[deviceListView.currentIndex];
-                    // Передаем ID устройства
-                    UsbManager.ejectDevice(selectedDevice.id);
-                }
+                            // Текст кнопки теперь более общий
+                            text: "Отключить\nустройство"
+                            Layout.alignment: Qt.AlignTop
+                            Layout.topMargin: 10
+                            // Кнопка активна, если любое устройство выбрано
+                            enabled: deviceListView.currentIndex !== -1
 
-                background: Rectangle {
-                    color: parent.enabled ? "#F44336" : "#666666"
-                    radius: 5
-                }
-                contentItem: Text {
-                    text: parent.text
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
-        }
+                            onClicked: {
+                                var selectedDevice = UsbManager.devices[deviceListView.currentIndex];
+
+                                // --- НОВАЯ ЛОГИКА ---
+                                if (selectedDevice.isEjectable) {
+                                    // Если это флешка, вызываем ejectDevice
+                                    UsbManager.ejectDevice(selectedDevice.id);
+                                } else {
+                                    // Если это мышь или другое устройство, вызываем disableDevice
+                                    UsbManager.disableDevice(selectedDevice.devInst);
+                                }
+                            }
+
+                            background: Rectangle {
+                                color: parent.enabled ? "#F44336" : "#666666"
+                                radius: 5
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                color: "white"
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                    }
+
 
         // --- Панель логов ---
         Rectangle {
