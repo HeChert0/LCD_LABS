@@ -29,7 +29,12 @@ qt_add_executable(LCD_LABS
     qml/labs/lab4/CameraWarningSprite.qml
     labs/lab4/CameraManager.cpp
     labs/lab4/CameraManager.h
+    qml/labs/lab5/Lab5Page.qml
+    qml/labs/lab5/TudaSudaSprite.qml
+    labs/lab5/UsbManager.cpp
+    labs/lab5/UsbManager.h
     ${LCD_LABS_RESOURCES}
+    qml/labs/lab3/PendulumSprite.qml
 
 
 )
@@ -40,6 +45,8 @@ target_link_libraries(LCD_LABS PRIVATE
     Qt6::QuickControls2
     Qt6::Network
     Qt6::Multimedia
+    Qt6::CorePrivate
     Powrprof # для SetSuspendState
     Setupapi #SetupDi
+    setupapi
 )

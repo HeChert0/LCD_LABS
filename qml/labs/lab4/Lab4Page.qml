@@ -20,12 +20,11 @@ Page {
         CameraManager.stopCamera()
     }
 
-    // Обработка сигналов для анимации
     Connections {
         target: CameraManager
         function onCameraDetected() {
-            cameraWarning = true
-            warningTimer.restart()
+                cameraWarning = false
+                warningPulseTimer.restart()
         }
         function onStealthPhotoTaken() {
             statusText.text = "📸 Stealth photo captured!"
@@ -63,6 +62,16 @@ Page {
         onTriggered: hotkeyText.text = ""
     }
 
+    Timer {
+        id: warningPulseTimer
+        interval: 50
+        repeat: false
+        onTriggered: {
+            cameraWarning = true
+            warningTimer.restart()
+        }
+    }
+
     Image {
         anchors.fill: parent
         source: (typeof projectDir !== "undefined" && projectDir !== "") ?
@@ -75,7 +84,6 @@ Page {
         anchors.margins: 20
         spacing: 15
 
-        // Заголовок
         RowLayout {
             Layout.fillWidth: true
 
@@ -108,7 +116,6 @@ Page {
             Item { Layout.fillWidth: true }
         }
 
-        // Панель информации
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 100
@@ -167,7 +174,6 @@ Page {
             }
         }
 
-        // Видео превью
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -185,7 +191,6 @@ Page {
                 }
             }
 
-            // Оверлей при неактивной камере
             Rectangle {
                 anchors.fill: parent
                 color: "#000000"
@@ -200,7 +205,6 @@ Page {
                 }
             }
 
-            // Индикатор записи
             Rectangle {
                 anchors.top: parent.top
                 anchors.right: parent.right
@@ -238,7 +242,6 @@ Page {
             }
         }
 
-        // Панель управления
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
@@ -251,7 +254,6 @@ Page {
                 anchors.margins: 10
                 spacing: 10
 
-                // Основные кнопки
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: 10
@@ -338,7 +340,6 @@ Page {
                     }
                 }
 
-                // Информация о горячих клавишах
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -392,7 +393,6 @@ Page {
             }
         }
 
-        // Статус бар
         Label {
             id: statusText
             Layout.fillWidth: true
@@ -403,7 +403,6 @@ Page {
         }
     }
 
-    // Анимированный персонаж - предупреждение о камере
     CameraWarningSprite {
         id: warningSprite
         anchors.bottom: parent.bottom

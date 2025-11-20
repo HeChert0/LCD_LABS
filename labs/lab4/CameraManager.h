@@ -100,6 +100,8 @@ private slots:
     void updateRecordingTime();
     void checkForCameraActivity();
 
+    void handleCameraActiveChanged(bool active);
+
 private:
     void initializeCamera();
     void createOutputDirectories();

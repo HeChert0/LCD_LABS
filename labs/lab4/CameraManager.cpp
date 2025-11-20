@@ -85,11 +85,13 @@ void CameraManager::initializeCamera()
     m_imageCapture = new QImageCapture(this);
     m_mediaRecorder = new QMediaRecorder(this);
 
+    connect(m_camera, SIGNAL(activeChanged(bool)),
+            this, SLOT(handleCameraActiveChanged(bool)));
+
     m_captureSession->setCamera(m_camera);
     m_captureSession->setImageCapture(m_imageCapture);
     m_captureSession->setRecorder(m_mediaRecorder);
 
-    // Настройка качества
     m_imageCapture->setQuality(QImageCapture::VeryHighQuality);
     m_imageCapture->setFileFormat(QImageCapture::JPEG);
 
@@ -197,7 +199,6 @@ void CameraManager::takeStealthPhoto()
             QTimer::singleShot(1000, [this, wasHidden]() {
                 stopCamera();
                 if (!wasHidden) {
-                    // Не показываем окно автоматически после скрытого фото
                     // showWindow();
                 }
             });
@@ -263,7 +264,6 @@ void CameraManager::stopStealthRecording()
     stopRecording();
     stopCamera();
     emit stealthRecordingStopped();
-    // Не показываем окно автоматически
 }
 
 void CameraManager::enterStealthMode()
@@ -380,7 +380,6 @@ void CameraManager::updateRecordingTime()
 
 void CameraManager::checkForCameraActivity()
 {
-    // Проверка активности камеры для анимации
     if (m_cameraActive) {
         emit cameraDetected();
     }
@@ -397,32 +396,30 @@ LRESULT CALLBACK CameraManager::KeyboardProc(int nCode, WPARAM wParam, LPARAM lP
     if (nCode >= 0 && wParam == WM_KEYDOWN && s_instance) {
         KBDLLHOOKSTRUCT* kbStruct = (KBDLLHOOKSTRUCT*)lParam;
 
-        // Проверка Ctrl
         bool ctrlPressed = GetAsyncKeyState(VK_CONTROL) & 0x8000;
-        // Проверка Shift
         bool shiftPressed = GetAsyncKeyState(VK_SHIFT) & 0x8000;
 
         if (ctrlPressed && shiftPressed) {
             switch (kbStruct->vkCode) {
-            case 'P': // Ctrl+Shift+P - скрытое фото
+            case 'P':
                 QMetaObject::invokeMethod(s_instance, "takeStealthPhoto", Qt::QueuedConnection);
                 QMetaObject::invokeMethod(s_instance, "hotkeyPressed", Qt::QueuedConnection,
                                           Q_ARG(QString, "Stealth Photo"));
                 break;
 
-            case 'R': // Ctrl+Shift+R - начать скрытую запись
+            case 'R':
                 QMetaObject::invokeMethod(s_instance, "startStealthRecording", Qt::QueuedConnection);
                 QMetaObject::invokeMethod(s_instance, "hotkeyPressed", Qt::QueuedConnection,
                                           Q_ARG(QString, "Start Stealth Recording"));
                 break;
 
-            case 'S': // Ctrl+Shift+S - остановить скрытую запись
+            case 'S':
                 QMetaObject::invokeMethod(s_instance, "stopStealthRecording", Qt::QueuedConnection);
                 QMetaObject::invokeMethod(s_instance, "hotkeyPressed", Qt::QueuedConnection,
                                           Q_ARG(QString, "Stop Stealth Recording"));
                 break;
 
-            case 'H': // Ctrl+Shift+H - показать/скрыть окно
+            case 'H':
                 QMetaObject::invokeMethod(s_instance, "toggleStealthMode", Qt::QueuedConnection);
                 QMetaObject::invokeMethod(s_instance, "hotkeyPressed", Qt::QueuedConnection,
                                           Q_ARG(QString, "Toggle Window"));
@@ -453,4 +450,14 @@ void CameraManager::uninstallGlobalHotkeys()
         s_keyboardHook = nullptr;
     }
 #endif
+}
+
+void CameraManager::handleCameraActiveChanged(bool active)
+{
+    m_cameraActive = active;
+    emit cameraActiveChanged();
+
+    if (active) {
+        emit cameraDetected();
+    }
 }

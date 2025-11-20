@@ -11,6 +11,7 @@
 #include "labs/lab2/PciManager.h"
 #include "labs/lab3/HddManager.h"
 #include "labs/lab4/CameraManager.h"
+#include "labs/lab5/UsbManager.h"
 
 
 static bool looksLikeProjectRoot(const QDir &dir) {
@@ -98,6 +99,13 @@ int main(int argc, char *argv[])
                                                 Q_UNUSED(scriptEngine)
                                                 return new CameraManager();
                                             });
+    qmlRegisterSingletonType<UsbManager>("com.company.UsbManager", 1, 0, "UsbManager",
+                                         [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+                                             Q_UNUSED(engine)
+                                             Q_UNUSED(scriptEngine)
+                                             return new UsbManager();
+                                         });
+
 
 
     QString projectRoot = detectProjectRoot();

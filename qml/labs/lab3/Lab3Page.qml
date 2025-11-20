@@ -31,6 +31,7 @@ Page {
 
         RowLayout {
             Layout.fillWidth: true
+            spacing: 10
 
             Button {
                 text: "← Назад"
@@ -50,6 +51,14 @@ Page {
                     verticalAlignment: Text.AlignVCenter
                 }
             }
+
+            PendulumSprite {
+                            id: pendulumAnimation
+                            scale: 0.8
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.preferredWidth: 165 * scale
+                            Layout.preferredHeight: 172 * scale
+                        }
 
             Item { Layout.fillWidth: true }
 
